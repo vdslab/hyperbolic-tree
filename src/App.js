@@ -1,25 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import * as d3 from "d3";
+import Dendrogram from "./Dendrogram";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  const [root, setRoot] = useState(null);
+  useEffect(() => {
+    (async () => {
+      const dataPath = "./data/visdata220905.json";
+      const dataResponse = await fetch(dataPath);
+      const data = await dataResponse.json();
+
+      const stratify = d3
+        .stratify()
+        .id((d) => d.no)
+        .parentId((d) => d.parent);
+      const dataStratify = stratify(data);
+      const root = d3.hierarchy(dataStratify);
+      setRoot(root);
+    })();
+  }, []);
+
+  if (root == null) {
+    return <p>Loading...</p>;
+  }
+  return <Dendrogram root={root} />;
 }
 
 export default App;
