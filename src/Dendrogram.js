@@ -1,6 +1,6 @@
 import { layoutDendrogram } from "./utils";
 import { Node } from "./Node";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import * as d3 from "d3";
 
 export default function Dendrogram({ root }) {

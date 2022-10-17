@@ -1,4 +1,3 @@
-import { useState } from "react";
 export function Node({ node, radius, geo, onClick }) {
   const selectedId = "6640";
   if (node.data.id === selectedId) {
@@ -26,7 +25,7 @@ export function Node({ node, radius, geo, onClick }) {
         r="6"
         // fill={y === 0 ? "red" : "black"}
         fill={node.data.id === selectedId ? "green" : "black"}
-        style={{ cursor: "pointer", transition: "d 1s" }}
+        style={{ cursor: "pointer", transition: "1s" }}
       />
     </g>
   );
