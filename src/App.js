@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
 import * as d3 from "d3";
 import Dendrogram from "./Dendrogram";
 
