@@ -46,13 +46,5 @@ export function layoutDendrogram({ root, radius }) {
       Math.sinh(node.h) * Math.sin(node.t),
       Math.cosh(node.h),
     ];
-    //ポアンカレ円盤の座標
-    // [node.x, node.y] = [node.hx / (node.hz + 1), node.hy / (node.hz + 1)];
-
-    // node.r = ((2 / ((1 - node.r) ^ 2)) ^ 2) * node.r;
-    // console.log(node.r, Math.asinh(node.r));
-    // node.r = Math.atanh(node.r);
-    // node.r = 1 / ((Math.cos(Math.asin(node.r)) + 1) / Math.sin(node.r));
-    // node.r *= radius;
   }
 }

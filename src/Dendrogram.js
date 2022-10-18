@@ -1,12 +1,9 @@
 import { layoutDendrogram } from "./utils";
 import { Node } from "./Node";
-import { useState, useEffect } from "react";
-import * as d3 from "d3";
+import { useState, useMemo } from "react";
 
 export default function Dendrogram({ root }) {
-  const [, setIni] = useState(null);
   const [geo, setGeo] = useState([0, 0]);
-  // const [selectedId, setSelectedId] = useState(null);
   const windowInnerWidth = window.innerWidth;
   const windowInnerHeight = window.innerHeight;
   const padding = 40;
@@ -16,21 +13,18 @@ export default function Dendrogram({ root }) {
     drawingAreaWidth < drawingAreaHeight
       ? drawingAreaWidth / 2
       : drawingAreaHeight / 2;
-  const nodes = root.descendants();
-  useEffect(() => {
-    setIni("drawing");
+  const nodes = useMemo(() => {
+    const nodes = root.descendants();
     layoutDendrogram({ root, radius });
-    const distanceMax = d3.max(nodes, (node) => {
-      return node.h;
-    });
-    console.log(distanceMax);
+    return nodes;
+    // const distanceMax = d3.max(nodes, (node) => {
+    //   return node.h;
+    // });
+    // console.log(distanceMax);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [root]);
   // const links = root.links();
 
-  if (root.hx === undefined) {
-    return <div>drawing</div>;
-  }
   return (
     <svg
       className="hyperbolic"
