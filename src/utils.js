@@ -16,6 +16,16 @@ function calculateAngle(node) {
   return node.t;
 }
 
+export function calculateGeo(nodes, geo) {
+  for (const node of nodes) {
+    node.hx -= geo[0];
+    node.hy -= geo[1];
+    const r = Math.sqrt(Math.pow(node.hx, 2) + Math.pow(node.hy, 2));
+    node.hz = Math.cosh(Math.asinh(r));
+    [node.x, node.y] = [node.hx / (node.hz + 1), node.hy / (node.hz + 1)];
+  }
+}
+
 export function layoutDendrogram({ root, radius }) {
   const pie = d3
     .pie()
@@ -34,12 +44,13 @@ export function layoutDendrogram({ root, radius }) {
         (root.data.data.distance - node.data.data.distance) /
         root.data.data.distance;
     } else {
-      node.r = 1;
+      node.r = 0.9;
     }
     //双曲空間での広がり方に対応(H=(2 / ((1 - R) ^ 2)) ^ 2) * R)
-    node.h = ((2 / ((1 - node.r) ^ 2)) ^ 2) * node.r;
+    // node.h = ((2 / ((1 - node.r) ^ 2)) ^ 2) * node.r * 10;
+    node.h = (2 / (1 - node.r ** 2)) ** 2 * node.r;
     //双曲空間の傾き
-    node.r = Math.tanh(node.h);
+    // node.A = Math.tanh(node.h);
     //双曲空間の座標
     [node.hx, node.hy, node.hz] = [
       Math.sinh(node.h) * Math.cos(node.t),
@@ -48,3 +59,13 @@ export function layoutDendrogram({ root, radius }) {
     ];
   }
 }
+
+// export function initialDistanceThreshold(searchParams, root) {
+//   if (searchParams.has("distanceThreshold")) {
+//     const distanceThreshold = +searchParams.get("distanceThreshold");
+//     if (distanceThreshold > 0) {
+//       return distanceThreshold;
+//     }
+//   }
+//   return distanceBinarySearch(root);
+// }
