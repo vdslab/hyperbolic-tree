@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 export function Link({ link, radius }) {
-  const poincareR = 3;
+  const poincareR = 1;
   const displayR = poincareR * radius;
   const [x1, y1] = [radius * link.source.x, radius * link.source.y];
   const [x2, y2] = [radius * link.target.x, radius * link.target.y];

@@ -18,22 +18,11 @@ export default function Dendrogram({ root }) {
   const nodes = useMemo(() => {
     const nodes = root.descendants();
     layoutDendrogram({ root, radius });
-    const distanceMax = d3.max(nodes, (node) => {
-      return node.h;
-    });
     return nodes;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [root]);
   calculateGeo(nodes, geo);
-  const hzExtent = d3.extent(nodes, (node) => {
-    return node.hz;
-  });
-  console.log(hzExtent);
 
-  const rScale = d3
-    .scaleLinear()
-    .domain([hzExtent[0], hzExtent[1] / 1000])
-    .range([100, 0]);
   const links = root.links();
 
   return (
@@ -49,7 +38,7 @@ export default function Dendrogram({ root }) {
             drawingAreaHeight / 2
           })`}
         >
-          {/* {links.map((link) => {
+          {links.map((link) => {
             return (
               <Link
                 key={link.target.data.id}
@@ -57,23 +46,19 @@ export default function Dendrogram({ root }) {
                 radius={radius}
               ></Link>
             );
-          })} */}
-          {nodes
-            // .filter((node) => node.hz <= hzExtent[1] / 1000)
-            .map((node) => {
-              return (
-                <Node
-                  key={node.data.id}
-                  node={node}
-                  radius={radius}
-                  geo={geo}
-                  r={rScale(node.hz)}
-                  onClick={() => {
-                    setGeo([node.hx, node.hy]);
-                  }}
-                ></Node>
-              );
-            })}
+          })}
+          {nodes.map((node) => {
+            return (
+              <Node
+                key={node.data.id}
+                node={node}
+                radius={radius}
+                onClick={() => {
+                  setGeo([node.hx, node.hy]);
+                }}
+              ></Node>
+            );
+          })}
         </g>
       </g>
     </svg>
