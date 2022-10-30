@@ -70,7 +70,8 @@ export function project(data, [x0, y0], radius) {
       };
     }),
     contour: [...Array(10)].map((_, i) => {
-      const hr = 2 * Math.atanh(0.1 * (i + 1) - 1e-3);
+      const r0 = 1 - 0.5 ** (i + 1) - 1e-3;
+      const hr = 2 * Math.atanh(r0);
 
       const x = -x0;
       const y = -y0;
@@ -116,9 +117,9 @@ export function layoutDendrogram(data) {
     .range([0.1, 0.3]);
   for (const node of root) {
     // log scale distance
-    const hd = Math.log(
-      (root.data.data.distance - node.data.data.distance) * 100 + 1,
-    );
+    const hd =
+      Math.log((root.data.data.distance - node.data.data.distance) * 100 + 1) /
+      Math.log(2);
     node.hr = hrScale(node.descendants().length);
     // project to disk
     const d = Math.tanh(hd / 2);
