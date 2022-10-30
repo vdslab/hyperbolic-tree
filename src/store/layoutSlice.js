@@ -10,6 +10,8 @@ export const layoutSlice = createSlice({
     radiusMax: 0.3,
     displayThreshold: 0.9,
     center: [0, 0],
+    selectedId: null,
+    rootId: null,
   },
   reducers: {
     setData: (state, action) => {
@@ -32,6 +34,12 @@ export const layoutSlice = createSlice({
     },
     setCenter: (state, action) => {
       state.center = action.payload;
+    },
+    setSelectedId: (state, action) => {
+      state.selectedId = action.payload;
+    },
+    setRootId: (state, action) => {
+      state.rootId = action.payload;
     },
   },
 });

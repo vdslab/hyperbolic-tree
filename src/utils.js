@@ -95,18 +95,22 @@ export function project(data, [x0, y0], radius) {
 
 export function layoutDendrogram(
   data,
-  { distanceScale, logBase, radiusMin, radiusMax },
+  { distanceScale, logBase, radiusMin, radiusMax, rootId },
 ) {
   const stratify = d3
     .stratify()
     .id((d) => d.no)
     .parentId((d) => d.parent);
   const dataStratify = stratify(data);
-  const root = d3.hierarchy(dataStratify);
+  const originalRoot = d3.hierarchy(dataStratify);
+  const root =
+    rootId == null
+      ? originalRoot
+      : originalRoot.descendants().find((node) => node.data.id === rootId);
   const pie = d3
     .pie()
     .sortValues(() => 0)
-    .padAngle(Math.PI / 180)
+    .padAngle(2 * Math.PI)
     .value((node) => node.leafCount);
   for (const item of pie(root.leaves())) {
     item.data.startAngle = item.startAngle;

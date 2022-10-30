@@ -11,6 +11,7 @@ export default function Dendrogram() {
   const radiusMin = useSelector((state) => state.layout.radiusMin);
   const radiusMax = useSelector((state) => state.layout.radiusMax);
   const geo = useSelector((state) => state.layout.center);
+  const rootId = useSelector((state) => state.layout.rootId);
 
   const windowInnerWidth = window.innerWidth;
   const windowInnerHeight = window.innerHeight;
@@ -31,8 +32,9 @@ export default function Dendrogram() {
       logBase,
       radiusMin,
       radiusMax,
+      rootId,
     });
-  }, [data, distanceScale, logBase, radiusMin, radiusMax]);
+  }, [data, distanceScale, logBase, radiusMin, radiusMax, rootId]);
   const { nodes, links, contour } = useMemo(() => {
     if (graph == null) {
       return {};

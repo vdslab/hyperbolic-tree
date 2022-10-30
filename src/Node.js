@@ -46,6 +46,7 @@ export function Node({ node }) {
     <g
       onClick={() => {
         dispatch(layoutSlice.actions.setCenter([node.x, node.y]));
+        dispatch(layoutSlice.actions.setSelectedId(node.id));
       }}
       transform={`translate(${node.cx},${node.cy})`}
       style={{ cursor: "pointer", transition: "1s" }}
