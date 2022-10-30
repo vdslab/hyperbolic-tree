@@ -7,7 +7,7 @@ export default function Dendrogram({ data }) {
   const [geo, setGeo] = useState([0, 0]);
   const windowInnerWidth = window.innerWidth;
   const windowInnerHeight = window.innerHeight;
-  const padding = 40;
+  const padding = 100;
   const drawingAreaWidth = windowInnerWidth - padding * 2;
   const drawingAreaHeight = windowInnerHeight - padding * 2;
   const radius =
@@ -21,16 +21,17 @@ export default function Dendrogram({ data }) {
   return (
     <svg
       className="hyperbolic"
-      viewBox={`0, 0, ${drawingAreaWidth + 10 + 10}, ${
-        drawingAreaHeight + 10 + 10
+      viewBox={`0, 0, ${drawingAreaWidth + padding * 2}, ${
+        drawingAreaHeight + padding * 2
       }`}
     >
-      <g transform={`translate(${10}, ${10})`}>
+      <g transform={`translate(${padding}, ${padding})`}>
         <g
           transform={`translate(${drawingAreaWidth / 2}, ${
             drawingAreaHeight / 2
           })`}
         >
+          <circle r={radius} fill="none" stroke="#888" />
           <g>
             {links.map((link) => {
               return (

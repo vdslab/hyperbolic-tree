@@ -41,6 +41,8 @@ export function project(data, [x0, y0], radius) {
       id: node.id,
       x: node.x,
       y: node.y,
+      xp: x,
+      yp: y,
       data: node.data,
       r: radius * r,
       cx: radius * cx,
@@ -91,11 +93,11 @@ export function layoutDendrogram(data) {
   const hrScale = d3
     .scaleSqrt()
     .domain([0, root.descendants().length])
-    .range([0, 1]);
+    .range([0.1, 0.3]);
   for (const node of root) {
     // log scale distance
     const hd = Math.log(
-      (root.data.data.distance - node.data.data.distance) * 500 + 1,
+      (root.data.data.distance - node.data.data.distance) * 250 + 1,
     );
     node.hr = hrScale(node.descendants().length);
     // project to disk
