@@ -88,9 +88,16 @@ export function layoutDendrogram(data) {
     item.data.padAngle = item.padAngle;
   }
   calculateAngle(root);
+  const hrScale = d3
+    .scaleSqrt()
+    .domain([0, root.descendants().length])
+    .range([0, 1]);
   for (const node of root) {
-    const hd = (root.data.data.distance - node.data.data.distance) * 5;
-    node.hr = 0.1;
+    // log scale distance
+    const hd = Math.log(
+      (root.data.data.distance - node.data.data.distance) * 500 + 1,
+    );
+    node.hr = hrScale(node.descendants().length);
     // project to disk
     const d = Math.tanh(hd / 2);
     node.x = d * Math.cos(node.t);
