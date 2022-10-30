@@ -16,29 +16,67 @@ function calculateAngle(node) {
   return node.t;
 }
 
-function calculateR(d) {
-  //双曲空間での半径を指定
-  const hr = 0.1;
-  const [hr1, hr2] = [d - hr, d + hr];
-  const [hr1hz, hr2hz] = [Math.sqrt(1 + hr1 ** 2), Math.sqrt(1 + hr2 ** 2)];
-  const [dr1, dr2] = [(hr1hz + 1) / hr1, (hr2hz + 1) / hr2];
-  const [r1, r2] = [1 / dr1, 1 / dr2];
-  return Math.abs((r1 + r2) / 2 - r1);
-}
-export function calculateGeo(nodes, geo) {
-  for (const node of nodes) {
-    node.hx -= geo[0];
-    node.hy -= geo[1];
-    const d = Math.sqrt(node.hx ** 2 + node.hy ** 2);
-    const hz = Math.sqrt(1 + d ** 2);
-    const dx = (hz + 1) / node.hx;
-    const dy = (hz + 1) / node.hy;
+export function project(data, [x0, y0], radius) {
+  const nodes = {};
+  for (const node of data.nodes) {
+    // rotate around (x0, y0)
+    const dx = node.x - x0;
+    const dy = node.y - y0;
+    const dr = 1 - x0 * node.x - y0 * node.y;
+    const di = y0 * node.x - x0 * node.y;
+    const d = dr * dr + di * di;
+    const x = (dr * dx + di * dy) / d;
+    const y = (dr * dy - di * dx) / d;
 
-    [node.x, node.y, node.r] = [1 / dx, 1 / dy, calculateR(d)];
+    // calculate circle geometry
+    const hd = 2 * Math.atanh(Math.sqrt(x ** 2 + y ** 2));
+    const t = Math.atan2(y, x);
+    const dNear = Math.tanh((hd - node.hr) / 2);
+    const dFar = Math.tanh((hd + node.hr) / 2);
+    const r = (dFar - dNear) / 2;
+    const cx = (Math.cos(t) * (dNear + dFar)) / 2;
+    const cy = (Math.sin(t) * (dNear + dFar)) / 2;
+
+    nodes[node.id] = {
+      id: node.id,
+      x: node.x,
+      y: node.y,
+      data: node.data,
+      r: radius * r,
+      cx: radius * cx,
+      cy: radius * cy,
+    };
   }
+  return {
+    nodes: data.nodes.map((node) => nodes[node.id]),
+    links: data.links.map((link) => {
+      const source = nodes[link.source];
+      const target = nodes[link.target];
+      const [x1, y1] = [source.cx, source.cy];
+      const [x2, y2] = [target.cx, target.cy];
+      const b1 = (x1 ** 2 + y1 ** 2 + radius ** 2) / 2;
+      const b2 = (x2 ** 2 + y2 ** 2 + radius ** 2) / 2;
+      const d = x1 * y2 - y1 * x2;
+      const cx = (y2 * b1 - y1 * b2) / d;
+      const cy = (x1 * b2 - x2 * b1) / d;
+      return {
+        source,
+        target,
+        cx,
+        cy,
+        r: Math.sqrt(cx ** 2 + cy ** 2 - radius ** 2),
+      };
+    }),
+  };
 }
 
-export function layoutDendrogram({ root, radius }) {
+export function layoutDendrogram(data) {
+  const stratify = d3
+    .stratify()
+    .id((d) => d.no)
+    .parentId((d) => d.parent);
+  const dataStratify = stratify(data);
+  const root = d3.hierarchy(dataStratify);
   const pie = d3
     .pie()
     .sortValues(() => 0)
@@ -51,26 +89,28 @@ export function layoutDendrogram({ root, radius }) {
   }
   calculateAngle(root);
   for (const node of root) {
-    if (node.children) {
-      node.d =
-        (root.data.data.distance - node.data.data.distance) /
-        root.data.data.distance;
-    } else {
-      node.d = 0.9;
-    }
-    //双曲空間にdistanceをx軸にして貼り付ける
-    node.d *= 50;
-    node.h = Math.sqrt(1 + node.d ** 2);
-    [node.hx, node.hy] = [node.d * Math.cos(node.t), node.d * Math.sin(node.t)];
+    const hd = (root.data.data.distance - node.data.data.distance) * 5;
+    node.hr = 0.1;
+    // project to disk
+    const d = Math.tanh(hd / 2);
+    node.x = d * Math.cos(node.t);
+    node.y = d * Math.sin(node.t);
   }
+  return {
+    nodes: root.descendants().map((node) => {
+      return {
+        id: node.data.id,
+        x: node.x,
+        y: node.y,
+        hr: node.hr,
+        data: node.data.data,
+      };
+    }),
+    links: root.links().map((link) => {
+      return {
+        source: link.source.data.id,
+        target: link.target.data.id,
+      };
+    }),
+  };
 }
-
-// export function initialDistanceThreshold(searchParams, root) {
-//   if (searchParams.has("distanceThreshold")) {
-//     const distanceThreshold = +searchParams.get("distanceThreshold");
-//     if (distanceThreshold > 0) {
-//       return distanceThreshold;
-//     }
-//   }
-//   return distanceBinarySearch(root);
-// }

@@ -1,10 +1,9 @@
-import { calculateGeo, layoutDendrogram } from "./utils";
+import { project } from "./utils";
 import { Node } from "./Node";
 import { Link } from "./Link";
 import { useState, useMemo } from "react";
-import * as d3 from "d3";
 
-export default function Dendrogram({ root }) {
+export default function Dendrogram({ data }) {
   const [geo, setGeo] = useState([0, 0]);
   const windowInnerWidth = window.innerWidth;
   const windowInnerHeight = window.innerHeight;
@@ -15,15 +14,9 @@ export default function Dendrogram({ root }) {
     drawingAreaWidth < drawingAreaHeight
       ? drawingAreaWidth / 2
       : drawingAreaHeight / 2;
-  const nodes = useMemo(() => {
-    const nodes = root.descendants();
-    layoutDendrogram({ root, radius });
-    return nodes;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [root]);
-  calculateGeo(nodes, geo);
-
-  const links = root.links();
+  const { nodes, links } = useMemo(() => {
+    return project(data, geo, radius);
+  }, [data, geo, radius]);
 
   return (
     <svg
@@ -38,27 +31,26 @@ export default function Dendrogram({ root }) {
             drawingAreaHeight / 2
           })`}
         >
-          {links.map((link) => {
-            return (
-              <Link
-                key={link.target.data.id}
-                link={link}
-                radius={radius}
-              ></Link>
-            );
-          })}
-          {nodes.map((node) => {
-            return (
-              <Node
-                key={node.data.id}
-                node={node}
-                radius={radius}
-                onClick={() => {
-                  setGeo([node.hx, node.hy]);
-                }}
-              ></Node>
-            );
-          })}
+          <g>
+            {links.map((link) => {
+              return (
+                <Link key={`${link.source.id}:${link.target.id}`} link={link} />
+              );
+            })}
+          </g>
+          <g>
+            {nodes.map((node) => {
+              return (
+                <Node
+                  key={node.id}
+                  node={node}
+                  onClick={() => {
+                    setGeo([node.x, node.y]);
+                  }}
+                />
+              );
+            })}
+          </g>
         </g>
       </g>
     </svg>

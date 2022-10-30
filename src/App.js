@@ -1,29 +1,22 @@
 import { useState, useEffect } from "react";
-import * as d3 from "d3";
 import Dendrogram from "./Dendrogram";
+import { layoutDendrogram } from "./utils";
 
 function App() {
-  const [root, setRoot] = useState(null);
+  const [data, setData] = useState(null);
   useEffect(() => {
     (async () => {
       const dataPath = "./data/visdata220905.json";
       const dataResponse = await fetch(dataPath);
       const data = await dataResponse.json();
-
-      const stratify = d3
-        .stratify()
-        .id((d) => d.no)
-        .parentId((d) => d.parent);
-      const dataStratify = stratify(data);
-      const root = d3.hierarchy(dataStratify);
-      setRoot(root);
+      setData(layoutDendrogram(data));
     })();
   }, []);
 
-  if (root == null) {
+  if (data == null) {
     return <p>Loading...</p>;
   }
-  return <Dendrogram root={root} />;
+  return <Dendrogram data={data} />;
 }
 
 export default App;
