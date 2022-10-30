@@ -14,7 +14,7 @@ export default function Dendrogram({ data }) {
     drawingAreaWidth < drawingAreaHeight
       ? drawingAreaWidth / 2
       : drawingAreaHeight / 2;
-  const { nodes, links } = useMemo(() => {
+  const { nodes, links, contour } = useMemo(() => {
     return project(data, geo, radius);
   }, [data, geo, radius]);
 
@@ -31,7 +31,24 @@ export default function Dendrogram({ data }) {
             drawingAreaHeight / 2
           })`}
         >
-          <circle r={radius} fill="none" stroke="#888" />
+          <g>
+            <circle r={radius} fill="none" stroke="#888" />
+          </g>
+          <g>
+            {contour.map((item, i) => {
+              return (
+                <g key={i}>
+                  <circle
+                    cx={item.cx}
+                    cy={item.cy}
+                    r={item.r}
+                    fill="none"
+                    stroke="#888"
+                  />
+                </g>
+              );
+            })}
+          </g>
           <g>
             {links.map((link) => {
               return (
