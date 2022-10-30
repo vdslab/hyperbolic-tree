@@ -93,7 +93,10 @@ export function project(data, [x0, y0], radius) {
   };
 }
 
-export function layoutDendrogram(data) {
+export function layoutDendrogram(
+  data,
+  { distanceScale, logBase, radiusMin, radiusMax },
+) {
   const stratify = d3
     .stratify()
     .id((d) => d.no)
@@ -114,12 +117,12 @@ export function layoutDendrogram(data) {
   const hrScale = d3
     .scaleSqrt()
     .domain([0, root.descendants().length])
-    .range([0.1, 0.3]);
+    .range([radiusMin, radiusMax]);
   for (const node of root) {
     // log scale distance
-    const hd =
-      Math.log((root.data.data.distance - node.data.data.distance) * 100 + 1) /
-      Math.log(2);
+    const hd0 =
+      (root.data.data.distance - node.data.data.distance) * distanceScale;
+    const hd = Math.log(hd0 + 1) / Math.log(logBase);
     node.hr = hrScale(node.descendants().length);
     // project to disk
     const d = Math.tanh(hd / 2);

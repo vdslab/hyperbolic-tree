@@ -1,6 +1,12 @@
+import { useDispatch, useSelector } from "react-redux";
+import { layoutSlice } from "./store/layoutSlice";
+
 function NodeWords({ node }) {
+  const displayThreshold = useSelector(
+    (state) => state.layout.displayThreshold,
+  );
   const d = Math.sqrt(node.xp ** 2 + node.yp ** 2);
-  if (d > 0.95) {
+  if (d > displayThreshold) {
     return;
   }
   const displayWords = Math.floor((2 * node.r * Math.PI) / 10);
@@ -33,11 +39,14 @@ function NodeWords({ node }) {
   );
 }
 
-export function Node({ node, onClick }) {
+export function Node({ node }) {
+  const dispatch = useDispatch();
   const selectedId = "6640";
   return (
     <g
-      onClick={onClick}
+      onClick={() => {
+        dispatch(layoutSlice.actions.setCenter([node.x, node.y]));
+      }}
       transform={`translate(${node.cx},${node.cy})`}
       style={{ cursor: "pointer", transition: "1s" }}
     >
