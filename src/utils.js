@@ -16,6 +16,23 @@ function calculateAngle(node) {
   return node.t;
 }
 
+function aggregateCategory(node, categories) {
+  node.categories = {};
+  for (const category of categories) {
+    node.categories[category] = 0;
+  }
+  if (node.children) {
+    for (const child of node.children) {
+      aggregateCategory(child, categories);
+      for (const category of categories) {
+        node.categories[category] += child.categories[category];
+      }
+    }
+  } else {
+    node.categories[node.data.data.category] += 1;
+  }
+}
+
 export function project(data, [x0, y0], radius) {
   const nodes = {};
   for (const node of data.nodes) {
@@ -43,6 +60,7 @@ export function project(data, [x0, y0], radius) {
       y: node.y,
       xp: x,
       yp: y,
+      categories: node.categories,
       data: node.data,
       r: radius * r,
       cx: radius * cx,
@@ -118,6 +136,11 @@ export function layoutDendrogram(
     item.data.padAngle = item.padAngle;
   }
   calculateAngle(root);
+  const categories = [...new Set(data.map((item) => item.category))].filter(
+    (category) => category,
+  );
+  categories.sort();
+  aggregateCategory(root, categories);
   const hrScale = d3
     .scaleSqrt()
     .domain([0, root.descendants().length])
@@ -133,6 +156,7 @@ export function layoutDendrogram(
     node.x = d * Math.cos(node.t);
     node.y = d * Math.sin(node.t);
   }
+  const categoryColor = d3.scaleOrdinal(d3.schemeCategory10);
   return {
     nodes: root.descendants().map((node) => {
       return {
@@ -140,6 +164,7 @@ export function layoutDendrogram(
         x: node.x,
         y: node.y,
         hr: node.hr,
+        categories: node.categories,
         data: node.data.data,
       };
     }),
@@ -147,6 +172,12 @@ export function layoutDendrogram(
       return {
         source: link.source.data.id,
         target: link.target.data.id,
+      };
+    }),
+    categories: categories.map((category) => {
+      return {
+        label: category,
+        color: categoryColor(category),
       };
     }),
   };

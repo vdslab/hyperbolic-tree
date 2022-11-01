@@ -4,6 +4,34 @@ import { Link } from "./Link";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
 
+function Legend({ categories }) {
+  const itemHeight = 20;
+  return (
+    <>
+      {categories.map((item, i) => {
+        return (
+          <g
+            key={i}
+            transform={`translate(0, ${itemHeight * i + itemHeight / 2})`}
+          >
+            <rect
+              x="2"
+              y="-8"
+              width="16"
+              height="16"
+              fill={item.color}
+              stroke="#444"
+            />
+            <text x="24" dominantBaseline="central" fontSize="12">
+              {item.label}
+            </text>
+          </g>
+        );
+      })}
+    </>
+  );
+}
+
 export default function Dendrogram() {
   const data = useSelector((state) => state.layout.data);
   const distanceScale = useSelector((state) => state.layout.distanceScale);
@@ -53,6 +81,9 @@ export default function Dendrogram() {
       }`}
     >
       <g transform={`translate(${padding}, ${padding})`}>
+        <g transform={`translate(${drawingAreaWidth / 2 + radius},0)`}>
+          <Legend categories={graph.categories} />
+        </g>
         <g
           transform={`translate(${drawingAreaWidth / 2}, ${
             drawingAreaHeight / 2
@@ -85,7 +116,9 @@ export default function Dendrogram() {
           </g>
           <g>
             {nodes.map((node) => {
-              return <Node key={node.id} node={node} />;
+              return (
+                <Node key={node.id} node={node} categories={graph.categories} />
+              );
             })}
           </g>
         </g>
