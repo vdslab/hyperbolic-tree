@@ -56,10 +56,12 @@ export function project(data, [x0, y0], radius) {
 
     nodes[node.id] = {
       id: node.id,
+      t,
       x: node.x,
       y: node.y,
       xp: x,
       yp: y,
+      dp: Math.sqrt(x * x + y * y),
       categories: node.categories,
       data: node.data,
       r: radius * r,

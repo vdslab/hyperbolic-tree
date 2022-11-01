@@ -23,7 +23,7 @@ export function Link({ link }) {
         stroke="black"
         fill="none"
         style={{ transition: "1s" }}
-      ></path>
+      />
     </g>
   );
 }

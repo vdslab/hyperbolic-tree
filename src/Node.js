@@ -38,9 +38,25 @@ function NodeWords({ node }) {
   const displayThreshold = useSelector(
     (state) => state.layout.displayThreshold,
   );
-  const d = Math.sqrt(node.xp ** 2 + node.yp ** 2);
-  if (d > displayThreshold) {
+  if (node.dp > displayThreshold) {
     return;
+  }
+  if (node.data.distance === 0) {
+    const left = Math.cos(node.t) < 0;
+    const title = node.data.Title;
+    const maxLength = 30;
+    return (
+      <text
+        x={left ? -node.r - 1 : node.r + 1}
+        y="-1"
+        textAnchor={left ? "end" : "start"}
+        dominantBaseline="central"
+        fontWeight="bold"
+        fontSize="10"
+      >
+        {title.length >= maxLength ? `${title.slice(0, maxLength)}…` : title}
+      </text>
+    );
   }
   const displayWords = Math.floor((2 * node.r * Math.PI) / 10);
   const dtDegree = 360 / displayWords;
