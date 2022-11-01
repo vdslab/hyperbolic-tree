@@ -43,21 +43,33 @@ function NodeWords({ node }) {
     return;
   }
   const displayWords = Math.floor((2 * node.r * Math.PI) / 10);
-  const dt = 360 / displayWords;
+  const dtDegree = 360 / displayWords;
+  const dt = (Math.PI * dtDegree) / 180;
+  const arc = d3.arc();
+  const scoreMax = d3.max(node.data.WordScore, (item) => item.score);
   return (
     <g>
       {node.data.WordScore.slice(0, displayWords).map((item, i) => {
-        const left = Math.cos((Math.PI * dt * i) / 180) < 0;
+        const left = Math.cos(dt * i) < 0;
         return (
-          <g
-            key={i}
-            transform={
-              left
-                ? `rotate(${dt * i + 180})translate(${-node.r - 3},0)`
-                : `rotate(${dt * i})translate(${node.r + 3},0)`
-            }
-          >
+          <g key={i}>
+            <path
+              d={arc({
+                startAngle: dt * i - dt / 2 + Math.PI / 2,
+                endAngle: dt * i + dt / 2 + Math.PI / 2,
+                innerRadius: node.r,
+                outerRadius: node.r * (1 + 0.5 * (item.score / scoreMax)),
+              })}
+              fill="#ffffcc"
+              stroke="#444"
+            />
             <text
+              transform={
+                left
+                  ? `rotate(${dtDegree * i + 180})`
+                  : `rotate(${dtDegree * i})`
+              }
+              x={left ? -node.r - 3 : node.r + 3}
               textAnchor={left ? "end" : "start"}
               dominantBaseline="central"
               fontWeight="bold"
