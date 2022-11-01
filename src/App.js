@@ -11,6 +11,9 @@ function App() {
       const dataPath = "./data/visdata220905.json";
       const dataResponse = await fetch(dataPath);
       const data = await dataResponse.json();
+      for (const node of data) {
+        node.WordScore.sort((a, b) => b.score - a.score);
+      }
       dispatch(layoutSlice.actions.setData(data));
     })();
   }, [dispatch]);
