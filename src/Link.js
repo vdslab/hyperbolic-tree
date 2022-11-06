@@ -3,12 +3,7 @@ export function Link({ link }) {
   const t1 = Math.atan2(link.source.cy - link.cy, link.source.cx - link.cx);
   const t2 = Math.atan2(link.target.cy - link.cy, link.target.cx - link.cx);
   const path = d3.path();
-  if (
-    link.cx === -Infinity ||
-    link.cx === Infinity ||
-    link.cy === -Infinity ||
-    link.cy === Infinity
-  ) {
+  if (link.r > 1000 || Number.isNaN(link.r)) {
     path.moveTo(link.source.cx, link.source.cy);
     path.lineTo(link.target.cx, link.target.cy);
   } else {
