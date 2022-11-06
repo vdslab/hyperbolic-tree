@@ -4,6 +4,7 @@ export const layoutSlice = createSlice({
   name: "layout",
   initialState: {
     data: null,
+    layoutMethod: "bottomup",
     logBase: 2,
     distanceScale: 100,
     radiusMin: 0.1,
@@ -16,6 +17,9 @@ export const layoutSlice = createSlice({
   reducers: {
     setData: (state, action) => {
       state.data = action.payload;
+    },
+    setLayoutMethod: (state, action) => {
+      state.layoutMethod = action.payload;
     },
     setLogBase: (state, action) => {
       state.logBase = action.payload;

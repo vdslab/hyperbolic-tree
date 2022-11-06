@@ -4,6 +4,7 @@ import { layoutSlice } from "./store/layoutSlice";
 export default function Form() {
   const dispatch = useDispatch();
   const data = useSelector((state) => state.layout.data);
+  const layoutMethod = useSelector((state) => state.layout.layoutMethod);
   const distanceScale = useSelector((state) => state.layout.distanceScale);
   const logBase = useSelector((state) => state.layout.logBase);
   const radiusMin = useSelector((state) => state.layout.radiusMin);
@@ -19,6 +20,11 @@ export default function Form() {
         <form
           onSubmit={(event) => {
             event.preventDefault();
+            dispatch(
+              layoutSlice.actions.setLayoutMethod(
+                event.target.elements.layoutMethod.value,
+              ),
+            );
             dispatch(
               layoutSlice.actions.setDistanceScale(
                 +event.target.elements.distanceScale.value,
@@ -47,6 +53,17 @@ export default function Form() {
           }}
         >
           <div className="field">
+            <label className="label">Layout Method</label>
+            <div className="control">
+              <div className="select is-fullwidth">
+                <select name="layoutMethod" defaultValue={layoutMethod}>
+                  <option value="bottomup">Bottom Up</option>
+                  <option value="topdown">Top Down</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div className="field">
             <label className="label">Distance Scale</label>
             <div className="control">
               <input
@@ -65,6 +82,7 @@ export default function Form() {
                 className="input"
                 name="logBase"
                 type="number"
+                step="0.1"
                 defaultValue={logBase}
               />
             </div>

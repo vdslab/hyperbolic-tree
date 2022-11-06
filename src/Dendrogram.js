@@ -34,6 +34,7 @@ function Legend({ categories }) {
 
 export default function Dendrogram() {
   const data = useSelector((state) => state.layout.data);
+  const layoutMethod = useSelector((state) => state.layout.layoutMethod);
   const distanceScale = useSelector((state) => state.layout.distanceScale);
   const logBase = useSelector((state) => state.layout.logBase);
   const radiusMin = useSelector((state) => state.layout.radiusMin);
@@ -61,8 +62,17 @@ export default function Dendrogram() {
       radiusMin,
       radiusMax,
       rootId,
+      layoutMethod,
     });
-  }, [data, distanceScale, logBase, radiusMin, radiusMax, rootId]);
+  }, [
+    data,
+    distanceScale,
+    logBase,
+    radiusMin,
+    radiusMax,
+    rootId,
+    layoutMethod,
+  ]);
   const { nodes, links, contour } = useMemo(() => {
     if (graph == null) {
       return {};

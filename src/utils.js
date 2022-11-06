@@ -36,14 +36,7 @@ function aggregateCategory(node, categories) {
 export function project(data, [x0, y0], radius) {
   const nodes = {};
   for (const node of data.nodes) {
-    // rotate around (x0, y0)
-    const dx = node.x - x0;
-    const dy = node.y - y0;
-    const dr = 1 - x0 * node.x - y0 * node.y;
-    const di = y0 * node.x - x0 * node.y;
-    const d = dr * dr + di * di;
-    const x = (dr * dx + di * dy) / d;
-    const y = (dr * dy - di * dx) / d;
+    const [x, y] = rotate([node.x, node.y], [x0, y0]);
 
     // calculate circle geometry
     const hd = 2 * Math.atanh(Math.sqrt(x ** 2 + y ** 2));
@@ -92,17 +85,7 @@ export function project(data, [x0, y0], radius) {
     contour: [...Array(10)].map((_, i) => {
       const r0 = 1 - 0.5 ** (i + 1) - 1e-3;
       const hr = 2 * Math.atanh(r0);
-
-      const x = -x0;
-      const y = -y0;
-      const hd = 2 * Math.atanh(Math.sqrt(x ** 2 + y ** 2));
-      const t = Math.atan2(y, x);
-      const dNear = Math.tanh((hd - hr) / 2);
-      const dFar = Math.tanh((hd + hr) / 2);
-      const r = (dFar - dNear) / 2;
-      const cx = (Math.cos(t) * (dNear + dFar)) / 2;
-      const cy = (Math.sin(t) * (dNear + dFar)) / 2;
-
+      const { r, cx, cy } = projectedCircle(hr, [x0, y0]);
       return {
         hr,
         r: radius * r,
@@ -115,7 +98,7 @@ export function project(data, [x0, y0], radius) {
 
 export function layoutDendrogram(
   data,
-  { distanceScale, logBase, radiusMin, radiusMax, rootId },
+  { distanceScale, logBase, radiusMin, radiusMax, rootId, layoutMethod },
 ) {
   const stratify = d3
     .stratify()
@@ -127,22 +110,7 @@ export function layoutDendrogram(
     rootId == null
       ? originalRoot
       : originalRoot.descendants().find((node) => node.data.id === rootId);
-  const pie = d3
-    .pie()
-    .sortValues(() => 0)
-    .padAngle(2 * Math.PI)
-    .value((node) => node.leafCount);
-  for (const item of pie(root.leaves())) {
-    item.data.startAngle = item.startAngle;
-    item.data.endAngle = item.endAngle;
-    item.data.padAngle = item.padAngle;
-  }
-  calculateAngle(root);
-  const categories = [...new Set(data.map((item) => item.category))].filter(
-    (category) => category,
-  );
-  categories.sort();
-  aggregateCategory(root, categories);
+
   const hrScale = d3
     .scaleSqrt()
     .domain([0, root.descendants().length])
@@ -151,13 +119,22 @@ export function layoutDendrogram(
     // log scale distance
     const hd0 =
       (root.data.data.distance - node.data.data.distance) * distanceScale;
-    const hd = Math.log(hd0 + 1) / Math.log(logBase);
+    node.hd = Math.log(hd0 + 1) / Math.log(logBase);
     node.hr = hrScale(node.descendants().length);
-    // project to disk
-    const d = Math.tanh(hd / 2);
-    node.x = d * Math.cos(node.t);
-    node.y = d * Math.sin(node.t);
   }
+
+  if (layoutMethod === "bottomup") {
+    bottomUpLayout(root);
+  } else {
+    topDownLayout(root);
+  }
+
+  const categories = [...new Set(data.map((item) => item.category))].filter(
+    (category) => category,
+  );
+  categories.sort();
+  aggregateCategory(root, categories);
+
   const categoryColor = d3.scaleOrdinal(d3.schemeCategory10);
   return {
     nodes: root.descendants().map((node) => {
@@ -182,5 +159,100 @@ export function layoutDendrogram(
         color: categoryColor(category),
       };
     }),
+  };
+}
+
+function bottomUpLayout(root) {
+  const pie = d3
+    .pie()
+    .sortValues(() => 0)
+    .padAngle(2 * Math.PI)
+    .value((node) => node.leafCount);
+  for (const item of pie(root.leaves())) {
+    item.data.startAngle = item.startAngle;
+    item.data.endAngle = item.endAngle;
+    item.data.padAngle = item.padAngle;
+  }
+  calculateAngle(root);
+  for (const node of root) {
+    const d = Math.tanh(node.hd / 2);
+    node.x = d * Math.cos(node.t);
+    node.y = d * Math.sin(node.t);
+  }
+}
+
+function topDownLayout(root) {
+  root.x = 0;
+  root.y = 0;
+  if (root.children) {
+    const dt = (2 * Math.PI) / root.children.length;
+    root.children.forEach((node, i) => {
+      const t = dt * i;
+      const d = Math.tanh(node.hd / 2);
+      node.x = d * Math.cos(t);
+      node.y = d * Math.sin(t);
+      recursiveLayout(node, root);
+    });
+  }
+}
+
+function recursiveLayout(node, root) {
+  if (!node.children) {
+    return;
+  }
+  const childAngle = Math.PI;
+  const dt = childAngle / (node.children.length - 1);
+  const [xo, yo] = rotate([root.x, root.y], [node.x, node.y]);
+  const to = Math.atan2(-yo, -xo);
+  node.children.forEach((child, i) => {
+    const { r: r2, cx, cy } = projectedCircle(child.hd, [node.x, node.y]);
+    const r1 = Math.sqrt(cx * cx + cy * cy);
+    const t = dt * i - childAngle / 2;
+    const d =
+      Math.sqrt(r2 * r2 - r1 * r1 * Math.cos(Math.PI / 2 - t) ** 2) -
+      r1 * Math.sin(Math.PI / 2 - t);
+    [child.x, child.y] = rotateInverse(
+      [d * Math.cos(t + to), d * Math.sin(t + to)],
+      [node.x, node.y],
+    );
+    recursiveLayout(child, root);
+  });
+}
+
+/**
+ * rotation about (x0, y0)
+ */
+function rotate([x, y], [x0, y0]) {
+  const dx = x - x0;
+  const dy = y - y0;
+  const dr = 1 - x0 * x - y0 * y;
+  const di = y0 * x - x0 * y;
+  const d = dr * dr + di * di;
+  return [(dr * dx + di * dy) / d, (dr * dy - di * dx) / d];
+}
+
+/**
+ * inverse rotation about (x0, y0)
+ */
+function rotateInverse([x, y], [x0, y0]) {
+  const dx = -x - x0;
+  const dy = -y - y0;
+  const dr = -1 - x0 * x - y0 * y;
+  const di = y0 * x - x0 * y;
+  const d = dr * dr + di * di;
+  return [(dr * dx + di * dy) / d, (dr * dy - di * dx) / d];
+}
+
+function projectedCircle(hr, [x0, y0]) {
+  const x = -x0;
+  const y = -y0;
+  const hd = 2 * Math.atanh(Math.sqrt(x ** 2 + y ** 2));
+  const t = Math.atan2(y, x);
+  const dNear = Math.tanh((hd - hr) / 2);
+  const dFar = Math.tanh((hd + hr) / 2);
+  return {
+    r: (dFar - dNear) / 2,
+    cx: (Math.cos(t) * (dNear + dFar)) / 2,
+    cy: (Math.sin(t) * (dNear + dFar)) / 2,
   };
 }
