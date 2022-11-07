@@ -60,6 +60,7 @@ export function project(data, [x0, y0], radius) {
       r: radius * r,
       cx: radius * cx,
       cy: radius * cy,
+      isVisible: node.isVisible,
     };
   }
   return {
@@ -129,6 +130,13 @@ export function layoutDendrogram(
     topDownLayout(root);
   }
 
+  root.isVisible = true;
+  if (root.children) {
+    for (const node of root.children) {
+      checkNodeVisibility(node, root);
+    }
+  }
+
   const categories = [...new Set(data.map((item) => item.category))].filter(
     (category) => category,
   );
@@ -145,6 +153,7 @@ export function layoutDendrogram(
         hr: node.hr,
         categories: node.categories,
         data: node.data.data,
+        isVisible: node.isVisible,
       };
     }),
     links: root.links().map((link) => {
@@ -255,4 +264,18 @@ function projectedCircle(hr, [x0, y0]) {
     cx: (Math.cos(t) * (dNear + dFar)) / 2,
     cy: (Math.sin(t) * (dNear + dFar)) / 2,
   };
+}
+
+function checkNodeVisibility(node, root) {
+  if (node.children) {
+    if (root.hr + node.hr <= node.hd - root.hd) {
+      node.isVisible = true;
+      root = node;
+    }
+    for (const child of node.children) {
+      checkNodeVisibility(child, root);
+    }
+  } else {
+    node.isVisible = true;
+  }
 }

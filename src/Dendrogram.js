@@ -125,11 +125,17 @@ export default function Dendrogram() {
             })}
           </g>
           <g>
-            {nodes.map((node) => {
-              return (
-                <Node key={node.id} node={node} categories={graph.categories} />
-              );
-            })}
+            {nodes
+              .filter((node) => node.isVisible)
+              .map((node) => {
+                return (
+                  <Node
+                    key={node.id}
+                    node={node}
+                    categories={graph.categories}
+                  />
+                );
+              })}
           </g>
         </g>
       </g>
