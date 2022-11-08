@@ -112,15 +112,16 @@ export function layoutDendrogram(
       ? originalRoot
       : originalRoot.descendants().find((node) => node.data.id === rootId);
 
+  const hdScale = d3
+    .scaleLinear()
+    .domain(d3.extent(root.descendants(), (node) => node.data.data.distance))
+    .range([10, 0]);
   const hrScale = d3
     .scaleSqrt()
     .domain([0, root.descendants().length])
     .range([radiusMin, radiusMax]);
   for (const node of root) {
-    // log scale distance
-    const hd0 =
-      (root.data.data.distance - node.data.data.distance) * distanceScale;
-    node.hd = Math.log(hd0 + 1) / Math.log(logBase);
+    node.hd = hdScale(node.data.data.distance);
     node.hr = hrScale(node.descendants().length);
   }
 
