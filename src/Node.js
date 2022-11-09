@@ -36,7 +36,7 @@ function NodePie({ node, categories }) {
 
 function NodeWords({ node }) {
   const displayThreshold = useSelector(
-    (state) => state.layout.displayThreshold,
+    (state) => state.layout.displayThreshold
   );
   if (node.dp > displayThreshold) {
     return;
@@ -111,6 +111,7 @@ export function Node({ node, categories }) {
       transform={`translate(${node.cx},${node.cy})`}
       style={{ cursor: "pointer", transition: "1s" }}
     >
+      <title>{node.data.Title + "\n" + node.data.Abstract}</title>
       <NodePie node={node} categories={categories} />
       <NodeWords node={node} />
     </g>

@@ -8,7 +8,7 @@ function App() {
   const dispatch = useDispatch();
   useEffect(() => {
     (async () => {
-      const dataPath = "./data/visdata220905.json";
+      const dataPath = "./data/jsons/visdata221109v2.json";
       const dataResponse = await fetch(dataPath);
       const data = await dataResponse.json();
       for (const node of data) {
