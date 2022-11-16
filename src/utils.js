@@ -33,6 +33,47 @@ function aggregateCategory(node, categories) {
   }
 }
 
+export function aggregateWords(node) {
+  if (node.children) {
+    const words = new Set();
+    const childrenWords = node.children.map((child) => {
+      const childWords = {};
+      for (const item of aggregateWords(child)) {
+        words.add(item.word);
+        childWords[item.word] = item.score;
+      }
+      return childWords;
+    });
+    const minWordScore = {};
+    for (const word of words) {
+      minWordScore[word] = childrenWords.every((childWord) => word in childWord)
+        ? d3.min(childrenWords, (childWords) => childWords[word])
+        : 0;
+    }
+    for (const child of node.children) {
+      child.data.data.WordScore = child.data.data.TopicScore.map((item) => {
+        return {
+          word: item.word,
+          score: item.score - minWordScore[item.word],
+        };
+      }).filter((item) => item.score > 0);
+    }
+    node.data.data.TopicScore = [];
+    for (const word of words) {
+      if (minWordScore[word] > 0) {
+        node.data.data.TopicScore.push({
+          word,
+          score: node.children.length * minWordScore[word],
+        });
+      }
+    }
+    node.data.data.TopicScore.sort((item1, item2) => item2.score - item1.score);
+    return node.data.data.TopicScore;
+  } else {
+    return node.data.data.TopicScore;
+  }
+}
+
 export function project(data, [x0, y0], radius) {
   const nodes = {};
   for (const node of data.nodes) {
