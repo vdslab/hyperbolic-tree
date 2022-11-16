@@ -10,7 +10,7 @@ export default function Form() {
   const radiusMin = useSelector((state) => state.layout.radiusMin);
   const radiusMax = useSelector((state) => state.layout.radiusMax);
   const displayThreshold = useSelector(
-    (state) => state.layout.displayThreshold,
+    (state) => state.layout.displayThreshold
   );
   const selectedId = useSelector((state) => state.layout.selectedId);
   return (
@@ -22,33 +22,33 @@ export default function Form() {
             event.preventDefault();
             dispatch(
               layoutSlice.actions.setLayoutMethod(
-                event.target.elements.layoutMethod.value,
-              ),
+                event.target.elements.layoutMethod.value
+              )
             );
             dispatch(
               layoutSlice.actions.setDistanceScale(
-                +event.target.elements.distanceScale.value,
-              ),
+                +event.target.elements.distanceScale.value
+              )
             );
             dispatch(
               layoutSlice.actions.setLogBase(
-                +event.target.elements.logBase.value,
-              ),
+                +event.target.elements.logBase.value
+              )
             );
             dispatch(
               layoutSlice.actions.setRadiusMin(
-                +event.target.elements.radiusMin.value,
-              ),
+                +event.target.elements.radiusMin.value
+              )
             );
             dispatch(
               layoutSlice.actions.setRadiusMax(
-                +event.target.elements.radiusMax.value,
-              ),
+                +event.target.elements.radiusMax.value
+              )
             );
             dispatch(
               layoutSlice.actions.setDisplayThreshold(
-                +event.target.elements.displayThreshold.value,
-              ),
+                +event.target.elements.displayThreshold.value
+              )
             );
           }}
         >
@@ -139,8 +139,8 @@ export default function Form() {
             event.preventDefault();
             dispatch(
               layoutSlice.actions.setRootId(
-                event.target.elements.rootId.value || null,
-              ),
+                event.target.elements.rootId.value || null
+              )
             );
             dispatch(layoutSlice.actions.setCenter([0, 0]));
           }}
@@ -154,7 +154,7 @@ export default function Form() {
                   value={selectedId || ""}
                   onChange={(event) => {
                     dispatch(
-                      layoutSlice.actions.setSelectedId(event.target.value),
+                      layoutSlice.actions.setSelectedId(event.target.value)
                     );
                   }}
                 >
@@ -162,8 +162,8 @@ export default function Form() {
                   {data &&
                     data.map((item) => {
                       return (
-                        <option key={item.no} value={item.no}>
-                          {item.no}
+                        <option key={item.id} value={item.id}>
+                          {item.id}
                         </option>
                       );
                     })}

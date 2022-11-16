@@ -43,7 +43,7 @@ function NodeWords({ node }) {
   }
   if (node.data.distance === 0) {
     const left = Math.cos(node.t) < 0;
-    const title = node.data.Title;
+    const title = node.data.name;
     const maxLength = 30;
     return (
       <text
