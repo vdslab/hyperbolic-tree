@@ -8,12 +8,12 @@ function App() {
   const dispatch = useDispatch();
   useEffect(() => {
     (async () => {
-      const dataPath = "./data/jsons/visdata221109v2.json";
+      const dataPath = "./data/jsons/visdata221116.json";
       const dataResponse = await fetch(dataPath);
       const data = await dataResponse.json();
       for (const node of data) {
-        node.category = node.Conference;
-        node.WordScore.sort((a, b) => b.score - a.score);
+        // node.category = node.topic;
+        node.keywords.sort((a, b) => b.score - a.score);
       }
       dispatch(layoutSlice.actions.setData(data));
     })();

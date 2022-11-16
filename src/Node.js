@@ -62,10 +62,10 @@ function NodeWords({ node }) {
   const dtDegree = 360 / displayWords;
   const dt = (Math.PI * dtDegree) / 180;
   const arc = d3.arc();
-  const scoreMax = d3.max(node.data.WordScore, (item) => item.score);
+  const scoreMax = d3.max(node.data.keywords, (item) => item.score);
   return (
     <g>
-      {node.data.WordScore.slice(0, displayWords).map((item, i) => {
+      {node.data.keywords.slice(0, displayWords).map((item, i) => {
         const left = Math.cos(dt * i) < 0;
         return (
           <g key={i}>

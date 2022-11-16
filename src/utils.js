@@ -99,11 +99,11 @@ export function project(data, [x0, y0], radius) {
 
 export function layoutDendrogram(
   data,
-  { distanceScale, logBase, radiusMin, radiusMax, rootId, layoutMethod },
+  { distanceScale, logBase, radiusMin, radiusMax, rootId, layoutMethod }
 ) {
   const stratify = d3
     .stratify()
-    .id((d) => d.no)
+    .id((d) => d.id)
     .parentId((d) => d.parent);
   const dataStratify = stratify(data);
   const originalRoot = d3.hierarchy(dataStratify);
@@ -139,7 +139,7 @@ export function layoutDendrogram(
   }
 
   const categories = [...new Set(data.map((item) => item.category))].filter(
-    (category) => category,
+    (category) => category
   );
   categories.sort();
   aggregateCategory(root, categories);
@@ -223,7 +223,7 @@ function recursiveLayout(node, root) {
       r1 * Math.sin(Math.PI / 2 - t);
     [child.x, child.y] = rotateInverse(
       [d * Math.cos(t + to), d * Math.sin(t + to)],
-      [node.x, node.y],
+      [node.x, node.y]
     );
     recursiveLayout(child, root);
   });
