@@ -17,6 +17,9 @@ function NodePie({ node, categories }) {
       {arcs.map((item, i) => {
         return (
           <g key={i}>
+            <title>
+              {node.categories[item.data.label] + "\n" + node.data.child.length}
+            </title>
             <path
               d={arc({
                 innerRadius: 0,
@@ -111,7 +114,7 @@ export function Node({ node, categories }) {
       transform={`translate(${node.cx},${node.cy})`}
       style={{ cursor: "pointer", transition: "1s" }}
     >
-      <title>{node.data.Title + "\n" + node.data.Abstract}</title>
+      {/* <title>{title}</title> */}
       <NodePie node={node} categories={categories} />
       <NodeWords node={node} />
     </g>
