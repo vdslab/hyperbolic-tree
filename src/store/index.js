@@ -5,4 +5,9 @@ export const store = configureStore({
   reducer: {
     layout: layoutReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      immutableCheck: false,
+      serializableCheck: false,
+    }),
 });
