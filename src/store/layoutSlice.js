@@ -5,10 +5,10 @@ export const layoutSlice = createSlice({
   initialState: {
     data: null,
     layoutMethod: "bottomup",
-    logBase: 2,
+    logBase: 10,
     distanceScale: 100,
-    radiusMin: 0.1,
-    radiusMax: 0.3,
+    radiusMin: 0.8,
+    radiusMax: 0.9,
     displayThreshold: 0.9,
     center: [0, 0],
     selectedId: null,
