@@ -142,6 +142,7 @@ export function layoutDendrogram(
   data,
   { distanceScale, logBase, radiusMin, radiusMax, rootId, layoutMethod }
 ) {
+  console.log(logBase);
   const stratify = d3
     .stratify()
     .id((d) => d.id)
@@ -156,7 +157,7 @@ export function layoutDendrogram(
   const hdScale = d3
     .scaleLinear()
     .domain(d3.extent(root.descendants(), (node) => node.data.data.distance))
-    .range([10, 0]);
+    .range([logBase, 0]);
   const hrScale = d3
     .scaleSqrt()
     .domain([0, root.descendants().length])
