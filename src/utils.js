@@ -154,15 +154,17 @@ export function layoutDendrogram(
       : originalRoot.descendants().find((node) => node.data.id === rootId);
 
   const hdScale = d3
-    .scaleLinear()
-    .domain(d3.extent(root.descendants(), (node) => node.data.data.distance))
+    .scaleLog()
+    .domain(
+      d3.extent(root.descendants(), (node) => node.data.data.distance + 1)
+    )
     .range([logBase, 0]);
   const hrScale = d3
     .scaleSqrt()
     .domain([0, root.descendants().length])
     .range([radiusMin, radiusMax]);
   for (const node of root) {
-    node.hd = hdScale(node.data.data.distance);
+    node.hd = hdScale(node.data.data.distance + 1);
     node.hr = hrScale(node.descendants().length);
   }
 
