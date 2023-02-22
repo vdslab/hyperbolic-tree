@@ -2,14 +2,14 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import Dendrogram from "./Dendrogram";
 import Form from "./Form";
-// import List from "./List";
+import BasicTable from "./Table";
 import { layoutSlice } from "./store/layoutSlice";
 
 function App() {
   const dispatch = useDispatch();
   useEffect(() => {
     (async () => {
-      const dataPath = "./data/jsons/RS21_230125.json";
+      const dataPath = "./data/jsons/tdb/230208/T2V_CC_230222.json";
       const dataResponse = await fetch(dataPath);
       const data = await dataResponse.json();
       for (const node of data) {
@@ -28,8 +28,8 @@ function App() {
       <div className="form">
         <Form />
       </div>
-      {/* <div className="list">
-        <List />
+      {/* <div className="basicTable">
+        <BasicTable />
       </div> */}
     </div>
   );
