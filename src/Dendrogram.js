@@ -60,7 +60,7 @@ function drawDendrogram(args) {
     if (
       Math.hypot(
         link.source.cx - link.target.cx,
-        link.source.cy - link.target.cy,
+        link.source.cy - link.target.cy
       ) >= 5
     ) {
       ctx.save();
@@ -77,7 +77,7 @@ function drawDendrogram(args) {
           link.r,
           t1,
           t2,
-          Math.floor((t2 - t1 + 2 * Math.PI) / Math.PI) % 2 === 1,
+          Math.floor((t2 - t1 + 2 * Math.PI) / Math.PI) % 2 === 1
         );
       }
       ctx.strokeStyle = "#000";
@@ -121,7 +121,7 @@ function drawDendrogram(args) {
                 ? `${title.slice(0, maxLength)}…`
                 : title,
               left ? -node.r - 1 : node.r + 1,
-              -1,
+              -1
             );
           } else {
             const displayWords = Math.floor((2 * node.r * Math.PI) / 10);
@@ -173,7 +173,7 @@ export default function Dendrogram() {
   const geo = useSelector((state) => state.layout.center);
   const rootId = useSelector((state) => state.layout.rootId);
   const displayThreshold = useSelector(
-    (state) => state.layout.displayThreshold,
+    (state) => state.layout.displayThreshold
   );
   const [clickable, setClickable] = useState(false);
 
@@ -278,7 +278,7 @@ export default function Dendrogram() {
                 layoutSlice.actions.setCenter([
                   t * node.x + (1 - t) * x0,
                   t * node.y + (1 - t) * y0,
-                ]),
+                ])
               );
               if (t < 1) {
                 requestAnimationFrame(update);

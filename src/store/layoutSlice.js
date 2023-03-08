@@ -7,7 +7,7 @@ export const layoutSlice = createSlice({
     layoutMethod: "bottomup",
     logBase: 10,
     distanceScale: 100,
-    radiusMin: 0.8,
+    radiusMin: 0.3,
     radiusMax: 0.9,
     displayThreshold: 0.9,
     center: [0, 0],

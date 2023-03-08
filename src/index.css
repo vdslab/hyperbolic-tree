@@ -42,6 +42,10 @@ code {
 }
 
 .basicTable {
-  position: relative;
-  top:
+  position: absolute;
+  width:auto;
+  left: 300px;
+  right: 0%;
+  top: 100%;
+  padding: 1rem;
 }
