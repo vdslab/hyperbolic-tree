@@ -71,6 +71,7 @@ export default function BasicTable() {
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
+    tableRef.current && tableRef.current.scrollIntoView();
   };
 
   return (
